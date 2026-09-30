@@ -154,11 +154,74 @@ def delete_appointment(appointment_id):
     finally:
         connection.close()
 
-create_appointments_table()
+# create_appointments_table()
 # add_appointment(1, 1, "2026-11-06 09:45", "malaria")
-try:
-    add_appointment(1, 1, "2026-11-08 11:00", "follow-up")
-    print("Appointment booked.")
-except sqlite3.IntegrityError:
-    print("Patient or doctor does not exist.")
-print(view_appointments())
+# try:
+#     add_appointment(1, 1, "2026-11-08 11:00", "follow-up")
+#     print("Appointment booked.")
+# except sqlite3.IntegrityError:
+#     print("Patient or doctor does not exist.")
+# print(view_appointments())
+
+def create_visits_table():
+    connection = sqlite3.connect("meditrack.db")
+    try:
+        cursor = connection.cursor()                   
+        cursor.execute("""
+        CREATE TABLE IF NOT EXISTS visits (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        patient_id INTEGER NOT NULL,
+        visit_date TEXT NOT NULL,
+        symptoms TEXT,
+        diagnosis TEXT,
+        treatment TEXT,
+        prescription TEXT,
+        follow_up_date TEXT,
+        FOREIGN KEY (patient_id) REFERENCES patients (id)
+    )
+    """)
+        connection.commit()
+    finally:
+        connection.close() 
+
+def add_visit(patient_id, visit_date, symptoms, diagnosis, treatment, prescription, follow_up_date):
+    connection = sqlite3.connect("meditrack.db")
+    try:
+        cursor = connection.cursor()
+        cursor.execute("INSERT INTO visits (patient_id, visit_date, symptoms, diagnosis, treatment, prescription, follow_up_date) VALUES (?, ?, ?, ?, ?, ?, ?)", (patient_id, visit_date, symptoms, diagnosis, treatment, prescription, follow_up_date))
+        connection.commit()
+    finally:
+        connection.close()
+
+def view_visit():
+    connection = sqlite3.connect("meditrack.db")
+    try:
+        cursor = connection.cursor()
+        cursor.execute("SELECT * FROM visits")
+        rows = cursor.fetchall()
+    finally:
+        connection.close()
+    return rows
+
+def delete_visit(visit_id):
+    connection = sqlite3.connect("meditrack.db")
+    try:
+        cursor = connection.cursor()
+        cursor.execute("DELETE FROM visits WHERE id = ?", (visit_id,))
+        connection.commit()
+    finally:
+        connection.close()
+
+# create_visits_table()
+# add_visit(1, "2026-11-12 10:30", "malaria", "not critical", "malaria injection", "twice a day for three days", "2026-12-09 8:30")
+# delete_visit(1)
+# delete_visit(3)
+# print(view_visit())
+
+if __name__ == "__main__":
+    create_table()
+    create_doctors_table()
+    create_appointments_table()
+    create_visits_table()
+    print(view_visit())
+    
