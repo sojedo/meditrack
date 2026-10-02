@@ -58,6 +58,7 @@ def delete_patient(patient_id):
     connection = sqlite3.connect("meditrack.db")
     try:
         cursor = connection.cursor()
+        cursor.execute("PRAGMA foreign_keys = ON")
         cursor.execute("DELETE FROM patients WHERE id = ?", (patient_id,))
         connection.commit()
     finally:
@@ -188,6 +189,7 @@ def add_visit(patient_id, visit_date, symptoms, diagnosis, treatment, prescripti
     connection = sqlite3.connect("meditrack.db")
     try:
         cursor = connection.cursor()
+        cursor.execute("PRAGMA foreign_keys = ON")
         cursor.execute("INSERT INTO visits (patient_id, visit_date, symptoms, diagnosis, treatment, prescription, follow_up_date) VALUES (?, ?, ?, ?, ?, ?, ?)", (patient_id, visit_date, symptoms, diagnosis, treatment, prescription, follow_up_date))
         connection.commit()
     finally:
@@ -212,10 +214,50 @@ def delete_visit(visit_id):
     finally:
         connection.close()
 
+def view_appointments_detailed():
+    connection = sqlite3.connect("meditrack.db")
+    try:
+        cursor = connection.cursor()
+        cursor.execute("""
+            SELECT appointments.id, patients.name, doctors.name, appointments.appointment_date, appointments.reason
+            FROM appointments
+            JOIN patients ON appointments.patient_id = patients.id
+            JOIN doctors ON appointments.doctor_id = doctors.id
+        """)
+        rows = cursor.fetchall()
+    finally:
+        connection.close()
+    return rows
+
+def view_visits_detailed():
+    connection = sqlite3.connect("meditrack.db")
+    try:
+        cursor = connection.cursor()
+        cursor.execute("""
+            SELECT visits.id, patients.name, visits.visit_date, visits.symptoms,
+                   visits.diagnosis, visits.treatment, visits.prescription, visits.follow_up_date
+            FROM visits
+            JOIN patients ON visits.patient_id = patients.id
+        """)
+        rows = cursor.fetchall()
+    finally:
+        connection.close()
+    return rows
+
+def search_doctor_by_specialty(specialty):
+    connection = sqlite3.connect("meditrack.db")
+    try:
+        cursor = connection.cursor()
+        cursor.execute("SELECT * FROM doctors WHERE specialty = ?", (specialty,))
+        rows = cursor.fetchall()
+    finally:
+        connection.close()
+    return rows
+
 # create_visits_table()
 # add_visit(1, "2026-11-12 10:30", "malaria", "not critical", "malaria injection", "twice a day for three days", "2026-12-09 8:30")
-# delete_visit(1)
-# delete_visit(3)
+# delete_visit(4)
+# delete_visit(5)
 # print(view_visit())
 
 if __name__ == "__main__":
