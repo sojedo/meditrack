@@ -63,13 +63,7 @@ def delete_patient(patient_id):
         connection.commit()
     finally:
         connection.close()
-    
 
-# create_table()
-# add_patient("kate", 19)
-# print(view_patients())
-# delete_patient(2)
-# print(view_patients())
 
 def create_doctors_table():
     connection = sqlite3.connect("meditrack.db") 
@@ -104,9 +98,6 @@ def view_doctors():
     finally:
         connection.close()
     return rows
-# create_doctors_table()
-# add_doctor("Dr. Adeyemi", "pediatrics")
-# print(view_doctors())
 
 def create_appointments_table():
     connection = sqlite3.connect("meditrack.db") 
@@ -146,23 +137,25 @@ def view_appointments():
         connection.close()
     return rows
 
+def update_appointment(appointment_id, new_date, new_reason):
+    connection = sqlite3.connect("meditrack.db")
+    try:
+        cursor = connection.cursor()
+        cursor.execute("UPDATE appointments SET appointment_date = ?, reason = ? WHERE id = ?", (new_date, new_reason, appointment_id))
+        connection.commit()
+        return cursor.rowcount
+    finally:
+        connection.close()
+
 def delete_appointment(appointment_id):
     connection = sqlite3.connect("meditrack.db")
     try:
         cursor = connection.cursor()
         cursor.execute("DELETE FROM appointments WHERE id = ?", (appointment_id,))
         connection.commit()
+        return cursor.rowcount
     finally:
         connection.close()
-
-# create_appointments_table()
-# add_appointment(1, 1, "2026-11-06 09:45", "malaria")
-# try:
-#     add_appointment(1, 1, "2026-11-08 11:00", "follow-up")
-#     print("Appointment booked.")
-# except sqlite3.IntegrityError:
-#     print("Patient or doctor does not exist.")
-# print(view_appointments())
 
 def create_visits_table():
     connection = sqlite3.connect("meditrack.db")
@@ -211,6 +204,7 @@ def delete_visit(visit_id):
         cursor = connection.cursor()
         cursor.execute("DELETE FROM visits WHERE id = ?", (visit_id,))
         connection.commit()
+        return cursor.rowcount
     finally:
         connection.close()
 
@@ -254,11 +248,6 @@ def search_doctor_by_specialty(specialty):
         connection.close()
     return rows
 
-# create_visits_table()
-# add_visit(1, "2026-11-12 10:30", "malaria", "not critical", "malaria injection", "twice a day for three days", "2026-12-09 8:30")
-# delete_visit(4)
-# delete_visit(5)
-# print(view_visit())
 
 if __name__ == "__main__":
     create_table()

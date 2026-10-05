@@ -1,7 +1,18 @@
 import sqlite3
 
-from database import create_table, add_patient, view_patients, search_patient, add_appointment, view_doctors, view_appointments_detailed, add_visit,view_visits_detailed, add_doctor, search_doctor_by_specialty, update_patient_age, delete_patient
+from database import create_table, add_patient, view_patients, search_patient, add_appointment, view_doctors, view_appointments_detailed, add_visit,view_visits_detailed, add_doctor, search_doctor_by_specialty, update_patient_age, delete_patient, update_appointment, delete_appointment, delete_visit
 create_table()
+
+from datetime import datetime
+
+def get_valid_date(prompt):
+    while True:
+        date_text = input(prompt)
+        try:
+            datetime.strptime(date_text, "%Y-%m-%d %H:%M")
+            return date_text
+        except ValueError:
+            print("Invalid format. Please use YYYY-MM-DD HH:MM, e.g. 2026-11-12 10:30")
 
 while True:
     print("1. Register new patient")
@@ -16,7 +27,10 @@ while True:
     print("10. Register doctor")
     print("11. update patient age")
     print("12. Delete patient")
-    print("13. Exit")
+    print("13. Update appointment")
+    print("14. Delete appointment")
+    print("15. Delete visit")
+    print("16. Exit")
     choice = input("Choose an option: ")
 
     if choice == "1":
@@ -41,7 +55,7 @@ while True:
     elif choice == "4":
         patient_id = int(input("Enter patient ID: "))
         doctor_id = int(input("Enter doctor ID: "))
-        appointment_date = input("Enter date (YYYY-MM-DD HH:MM): ")
+        appointment_date = get_valid_date("Enter date (YYYY-MM-DD HH:MM): ")
         reason = input("Enter reason: ")
         try:
             add_appointment(patient_id, doctor_id, appointment_date, reason)
@@ -61,12 +75,14 @@ while True:
 
     elif choice == "7":
         patient_id = int(input("Enter patient ID: "))
-        visit_date = input("Enter visit date (YYYY-MM-DD HH:MM): ")
+        visit_date = get_valid_date("Enter date (YYYY-MM-DD HH:MM): ")
         symptoms = input("Enter symptoms: ")
         diagnosis = input("Enter diagnosis: ")
         treatment = input("Enter treatment: ")
         prescription = input("Enter prescription: ")
         follow_up_date = input("Enter follow-up date (YYYY-MM-DD), or leave blank: ")
+        if follow_up_date != "":
+            follow_up_date = get_valid_date("Enter follow-up date again, properly: ")
         try:
             add_visit(patient_id, visit_date, symptoms, diagnosis, treatment, prescription, follow_up_date)
             print("Visit recorded.")
@@ -101,15 +117,40 @@ while True:
 
     elif choice == "12":
         patient_id = int(input("Enter patient ID: "))
-        delete_patient(patient_id)
         try:
             delete_patient(patient_id)
             print("patient deleted")
         except sqlite3.IntegrityError:
             print("cannot delete - patient has an existing appointment or visit.")
     
-    
     elif choice == "13":
+        appointment_id = int(input("Enter appointment ID: "))
+        new_date = get_valid_date("Enter new date (YYYY-MM-DD HH:MM): ")
+        new_reason = input("Enter new reason: ")
+        rows_changed = update_appointment(appointment_id, new_date, new_reason)
+        if rows_changed == 0:
+            print("No appointment found with that ID.")
+        else:
+            print("Appointment updated.")
+        
+    
+    elif choice == "14":
+        appointment_id = int(input("Enter appointment ID: "))
+        rows_changed = delete_appointment(appointment_id)
+        if rows_changed == 0:
+            print("No appointment found with that ID.")
+        else:
+            print("Appointment deleted.")
+    
+    elif choice == "15":
+        visit_id = int(input("Enter visit ID: "))
+        rows_changed = delete_visit(visit_id)
+        if rows_changed == 0:
+            print("No visit found with that ID.")
+        else:
+            print("Visit deleted.")
+
+    elif choice == "16":
         print("Goodbye!")
         break
 
