@@ -44,6 +44,15 @@ def search_patient(name):
         connection.close()
     return rows
 
+def search_patient_by_id(patient_id):
+    connection = sqlite3.connect("meditrack.db")
+    try:
+        cursor = connection.cursor()
+        cursor.execute("SELECT * FROM patients WHERE id = ?", (patient_id,))
+        rows = cursor.fetchall()
+    finally:
+        connection.close()
+    return rows
 
 def update_patient_age(patient_id, new_age):
     connection = sqlite3.connect("meditrack.db")
