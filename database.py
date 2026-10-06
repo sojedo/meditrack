@@ -259,6 +259,16 @@ def search_doctor_by_specialty(specialty):
         connection.close()
     return rows
 
+def update_visit(visit_id, new_visit_date, new_treatment):
+    connection = sqlite3.connect("meditrack.db")
+    try:
+        cursor = connection.cursor()
+        cursor.execute("UPDATE visits SET visit_date = ?, treatment = ? WHERE id = ?", (new_visit_date, new_treatment, visit_id))
+        connection.commit()
+        return cursor.rowcount
+    finally:
+        connection.close()
+
 
 if __name__ == "__main__":
     create_table()

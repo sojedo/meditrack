@@ -13,6 +13,11 @@ from database import add_appointment
 from database import view_appointments_detailed
 from database import update_appointment
 from database import delete_appointment
+from database import add_visit
+from database import view_visit
+from database import view_visits_detailed
+from database import delete_visit
+from database import update_visit
 
 class PatientCreate(BaseModel):
     name: str
@@ -129,3 +134,54 @@ def delete_appointment_endpoint(appointment_id: int):
     if rows_changed == 0:
         raise HTTPException(status_code=404, detail="Appointment not found")
     return {"message": "Appointment deleted"}
+
+class visitCreate(BaseModel):
+    patient_id: int
+    visit_date: str 
+    symptoms: str 
+    diagnosis: str 
+    treatment: str 
+    prescription: str 
+    follow_up_date: str
+
+@app.post("/visits", status_code=201)
+def create_visit(visit: visitCreate):
+    try:
+        add_visit(visit.patient_id, visit.visit_date, visit.symptoms, visit.diagnosis, visit.treatment, visit.prescription, visit.follow_up_date)
+    except sqlite3.IntegrityError:
+        raise HTTPException(status_code=422, detail="Patient does not exist")
+    return {"message": "Visit booked"}
+
+class visitDetail(BaseModel):
+    id: int
+    patient_name: str
+    visit_date: str 
+    symptoms: str 
+    diagnosis: str 
+    treatment: str 
+    prescription: str 
+    follow_up_date: str
+
+@app.get("/visits", response_model=list[visitDetail])
+def get_visit():
+    rows = view_visits_detailed()
+    return [visitDetail(id=row[0], patient_name=row[1], visit_date=row[2], symptoms=row[3], diagnosis=row[4], treatment=row[5], prescription=row[6], follow_up_date=row[7]) for row in rows]
+
+class visitUpdate(BaseModel):
+    new_visit_date: str
+    new_treatment: str
+
+@app.put("/visits/{visit_id}")
+def update_visit_endpoint(visit_id: int, visit: visitUpdate):    
+    rows_changed = update_visit(visit_id, visit.new_visit_date, visit.new_treatment)
+    if rows_changed == 0:
+        raise HTTPException(status_code=404, detail="visit not found")
+    return {"message": "visit updated"}
+
+@app.delete("/visits/{visit_id}")
+def delete_visit_endpoint(visit_id: int):
+    
+    rows_changed = delete_visit(visit_id)
+    if rows_changed == 0:
+        raise HTTPException(status_code=404, detail="visit not found")
+    return {"message": "visit deleted"}
