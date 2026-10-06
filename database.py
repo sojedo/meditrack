@@ -58,8 +58,9 @@ def update_patient_age(patient_id, new_age):
     connection = sqlite3.connect("meditrack.db")
     try:
         cursor = connection.cursor()
-        cursor.execute("UPDATE patients SET age = ? WHERE id = ?", (patient_id, new_age))
+        cursor.execute("UPDATE patients SET age = ? WHERE id = ?", (new_age, patient_id))
         connection.commit()
+        return cursor.rowcount
     finally:
         connection.close()
 
@@ -70,6 +71,7 @@ def delete_patient(patient_id):
         cursor.execute("PRAGMA foreign_keys = ON")
         cursor.execute("DELETE FROM patients WHERE id = ?", (patient_id,))
         connection.commit()
+        return cursor.rowcount
     finally:
         connection.close()
 
