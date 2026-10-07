@@ -80,8 +80,7 @@
                 const list = document.getElementById("appointment-list");
         data.forEach(appointment => {
             const item = document.createElement("li");
-            item.textContent = `${patients.name} (doctor-name ${d.doctor-name}) (appointment-date ${d.appointment-date}) (reason ${d.reason}) `;
-                const deleteButton = document.createElement("button");
+            item.textContent = `${appointment.patient_name} with Dr. ${appointment.doctor_name} on ${appointment.appointment_date} — ${appointment.reason} `;                const deleteButton = document.createElement("button");
             deleteButton.textContent = "Delete";
             deleteButton.onclick = () => deleteAppointment(appointment.id);
 
@@ -212,7 +211,7 @@
             });
         }
 
-        function deletevist(visitId) {
+        function deleteVist(visitId) {
             fetch(`http://127.0.0.1:8000/visits/${visitId}`, {
                 method: "DELETE"
             })
