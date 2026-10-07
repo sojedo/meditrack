@@ -6,11 +6,38 @@
 <body>
     <h1>MediTrack — Patients</h1>
     <ul id="patient-list"></ul>
+    <ul id="doctor-list"></ul>
+    <ul id="appointment-list"></ul>
+    <ul id="visit-list"></ul>
 
     <h2>Register Patient</h2>
     <input type="text" id="name-input" placeholder="Name">
     <input type="number" id="age-input" placeholder="Age">
     <button onclick="registerPatient()">Register</button>
+    <h2>Register Doctor</h2>
+    <input type="text" id="doctor-name-input" placeholder="Name">
+    <input type="text" id="doctor-specialty-input" placeholder="Specialty">
+    <button onclick="registerDoctor()">Register</button>
+
+    <h2>Register appointment</h2>
+    <input type="text" id="patient-name-input" placeholder="Name">
+    <input type="text" id="doctors-name-input" placeholder="doctor name">
+    <input type="text" id="appointment-date-input" placeholder="date">
+    <input type="text" id="reason-input" placeholder="reason"> 
+    <button onclick="registerAppointment()">Register</button>
+
+    <h2>Register Visit</h2>
+    <input type="text" id="patients-name-input" placeholder="Name">
+    <input type="text" id="visit-date-input" placeholder="date">
+    <input type="text" id="sypmtoms-input" placeholder="sypmtoms">
+    <input type="text" id="diagnosis-input" placeholder="diagnosis"> 
+    <input type="text" id="treatment-input" placeholder="treatment">
+    <input type="text" id="prescription-input" placeholder="prescription">
+    <input type="text" id="follow-up-date-input" placeholder="date"> 
+ 
+ 
+
+    <button onclick="registerVisit()">Register</button>
 
     <script>
         fetch("http://127.0.0.1:8000/patients")
@@ -30,6 +57,56 @@
         });
             });
 
+        fetch("http://127.0.0.1:8000/doctors")
+            .then(response => response.json())
+            .then(data => {
+                const list = document.getElementById("doctor-list");
+        data.forEach(doctor => {
+            const item = document.createElement("li");
+            item.textContent = `${doctor.name} (specialty ${doctor.specialty}) `;
+
+            const deleteButton = document.createElement("button");
+            deleteButton.textContent = "Delete";
+            deleteButton.onclick = () => deleteDoctor(doctor.id);
+
+            item.appendChild(deleteButton);
+            list.appendChild(item);
+        });
+            });
+
+                fetch("http://127.0.0.1:8000/appointments")
+            .then(response => response.json())
+            .then(data => {
+                const list = document.getElementById("appointment-list");
+        data.forEach(appointment => {
+            const item = document.createElement("li");
+            item.textContent = `${patients.name} (doctor-name ${d.doctor-name}) (appointment-date ${d.appointment-date}) (reason ${d.reason}) `;
+                const deleteButton = document.createElement("button");
+            deleteButton.textContent = "Delete";
+            deleteButton.onclick = () => deleteAppointment(appointment.id);
+
+            item.appendChild(deleteButton);
+            list.appendChild(item);
+        });
+            });
+
+                fetch("http://127.0.0.1:8000/visits")
+            .then(response => response.json())
+            .then(data => {
+                const list = document.getElementById("visit-list");
+        data.forEach(visit => {
+            const item = document.createElement("li");
+            item.textContent = `${visit.patient_name} — ${visit.visit_date}: ${visit.symptoms}, ${visit.diagnosis}, ${visit.treatment}, ${visit.prescription} (follow-up: ${visit.follow_up_date}) `;
+
+            const deleteButton = document.createElement("button");
+            deleteButton.textContent = "Delete";
+            deleteButton.onclick = () => deleteVisit(visit.id);
+
+            item.appendChild(deleteButton);
+            list.appendChild(item);
+        });
+            });        
+        
         function registerPatient() {
             const name = document.getElementById("name-input").value;
             const age = document.getElementById("age-input").value;
@@ -57,6 +134,95 @@
                 location.reload();
             });
         }
+
+        function registerDoctor() {
+            const name = document.getElementById("doctor-name-input").value;
+            const specialty = document.getElementById("doctor-specialty-input").value;
+
+            fetch("http://127.0.0.1:8000/doctors", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ name: name, specialty: specialty })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                location.reload();
+            });
+        }
+
+        function deleteDoctor(doctorId) {
+            fetch(`http://127.0.0.1:8000/doctors/${doctorId}`, {
+                method: "DELETE"
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                location.reload();
+            });
+        }
+
+        function registerAppointment() {
+            const name = document.getElementById("patients-name-input").value;
+            const doctorsname = document.getElementById("doctors-name-input").value;
+            const appointmentdate = document.getElementById("appointment-date-input").value;
+            const reason = document.getElementById("reason-input").value;
+
+            fetch("http://127.0.0.1:8000/appointments", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ name: name, doctorsname: doctors-name, appointmentdate: appointment-date, reason: reason })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                location.reload();
+            });
+        }
+
+        function deleteAppointment(appointmentId) {
+            fetch(`http://127.0.0.1:8000/appointments/${appointmentId}`, {
+                method: "DELETE"
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                location.reload();
+            });
+        }
+
+        function registerVisit() {
+            const name = document.getElementById("patients-name-input").value;
+            const visitdate = document.getElementById("visit-date-input").value;
+            const sypmtoms = document.getElementById("syptoms-input").value;
+            const diagnosis = document.getElementById("diagnosis-input").value;
+            const treatment = document.getElementById("treatment-input").value;
+            const prescription = document.getElementById("prescription-input").value;
+            const followupdate = document.getElementById("follow-up-date-input").value;
+
+            fetch("http://127.0.0.1:8000/visits", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ name: name, visitdate: visit-date, sypmtoms: sypmtoms, diagnosis: diagnosis, treatment: treatment, prescription: prescription, followupdate: follow-up-date })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                location.reload();
+            });
+        }
+
+        function deletevist(visitId) {
+            fetch(`http://127.0.0.1:8000/visits/${visitId}`, {
+                method: "DELETE"
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                location.reload();
+            });
+        }
+
     </script>
 </body>
 </html>
