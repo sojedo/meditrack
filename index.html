@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>MediTrack</title>
+</head>
+<body>
+    <h1>MediTrack — Patients</h1>
+    <ul id="patient-list"></ul>
+
+    <h2>Register Patient</h2>
+    <input type="text" id="name-input" placeholder="Name">
+    <input type="number" id="age-input" placeholder="Age">
+    <button onclick="registerPatient()">Register</button>
+
+    <script>
+        fetch("http://127.0.0.1:8000/patients")
+            .then(response => response.json())
+            .then(data => {
+                const list = document.getElementById("patient-list");
+        data.forEach(patient => {
+            const item = document.createElement("li");
+            item.textContent = `${patient.name} (age ${patient.age}) `;
+
+            const deleteButton = document.createElement("button");
+            deleteButton.textContent = "Delete";
+            deleteButton.onclick = () => deletePatient(patient.id);
+
+            item.appendChild(deleteButton);
+            list.appendChild(item);
+        });
+            });
+
+        function registerPatient() {
+            const name = document.getElementById("name-input").value;
+            const age = document.getElementById("age-input").value;
+
+            fetch("http://127.0.0.1:8000/patients", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ name: name, age: parseInt(age) })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                location.reload();
+            });
+        }
+
+        
+        function deletePatient(patientId) {
+            fetch(`http://127.0.0.1:8000/patients/${patientId}`, {
+                method: "DELETE"
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                location.reload();
+            });
+        }
+    </script>
+</body>
+</html>

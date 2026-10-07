@@ -18,11 +18,24 @@ from database import view_visit
 from database import view_visits_detailed
 from database import delete_visit
 from database import update_visit
+from database import search_doctor_by_specialty
+from database import delete_doctor
+from database import search_doctor_by_id
 
 class PatientCreate(BaseModel):
     name: str
     age: int
 app = FastAPI()
+
+from fastapi.middleware.cors import CORSMiddleware
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 
 @app.get("/")
 def read_root():
@@ -85,10 +98,33 @@ def get_doctors():
     rows = view_doctors()
     return [Doctor(id=row[0], name=row[1], specialty=row[2]) for row in rows]
 
+@app.get("/doctors/{doctor_id}", response_model=Doctor)
+def get_doctor(doctor_id: int):
+    results = search_doctor_by_id(doctor_id)
+    if not results:
+        raise HTTPException(status_code=404, detail="Doctor not found")
+    row = results[0]
+    return Doctor(id=row[0], name=row[1], specialty=row[2])
+
 @app.post("/doctors", status_code=201)
 def create_doctor(doctor: DoctorCreate):
     add_doctor(doctor.name, doctor.specialty)
     return {"message": "Doctor created"}
+
+@app.get("/doctors/specialty/{specialty}", response_model=list[Doctor])
+def get_doctors_by_specialty(specialty: str):
+    rows = search_doctor_by_specialty(specialty)
+    if not rows:
+        raise HTTPException(status_code=404, detail="No doctors found with that specialty")
+    return [Doctor(id=row[0], name=row[1], specialty=row[2]) for row in rows]
+
+@app.delete("/doctors/{doctor_id}")
+def delete_doctor_endpoint(doctor_id: int):
+    
+    rows_changed = delete_doctor(doctor_id)
+    if rows_changed == 0:
+        raise HTTPException(status_code=404, detail="doctor not found")
+    return {"message": "doctor deleted"}
 
 class AppointmentCreate(BaseModel):
     patient_id: int

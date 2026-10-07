@@ -258,6 +258,16 @@ def search_doctor_by_specialty(specialty):
     finally:
         connection.close()
     return rows
+def search_doctor_by_id(doctor_id):
+    connection = sqlite3.connect("meditrack.db")
+    try:
+        cursor = connection.cursor()
+        cursor.execute("SELECT * FROM doctors WHERE id = ?", (doctor_id,))
+        rows = cursor.fetchall()
+    finally:
+        connection.close()
+    return rows
+
 
 def update_visit(visit_id, new_visit_date, new_treatment):
     connection = sqlite3.connect("meditrack.db")
@@ -269,6 +279,15 @@ def update_visit(visit_id, new_visit_date, new_treatment):
     finally:
         connection.close()
 
+def delete_doctor(doctor_id):
+    connection = sqlite3.connect("meditrack.db")
+    try:
+        cursor = connection.cursor()
+        cursor.execute("DELETE FROM doctors WHERE id = ?", (doctor_id,))
+        connection.commit()
+        return cursor.rowcount
+    finally:
+        connection.close()
 
 if __name__ == "__main__":
     create_table()
