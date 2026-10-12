@@ -20,26 +20,24 @@
     <button onclick="registerDoctor()">Register</button>
 
     <h2>Register appointment</h2>
-    <input type="text" id="patient-name-input" placeholder="Name">
-    <input type="text" id="doctors-name-input" placeholder="doctor name">
-    <input type="text" id="appointment-date-input" placeholder="date">
-    <input type="text" id="reason-input" placeholder="reason"> 
+    <input type="text" id="appt-patient-id-input" placeholder="Patient Id">
+    <input type="text" id="appt-doctor-id-input" placeholder="Doctor Id">
+    <input type="text" id="appt-date-input" placeholder="YYYY-MM-DD HH:MM">
+    <input type="text" id="appt-reason-input" placeholder="Reason"> 
     <button onclick="registerAppointment()">Register</button>
 
     <h2>Register Visit</h2>
-    <input type="text" id="patients-name-input" placeholder="Name">
-    <input type="text" id="visit-date-input" placeholder="date">
-    <input type="text" id="sypmtoms-input" placeholder="sypmtoms">
-    <input type="text" id="diagnosis-input" placeholder="diagnosis"> 
-    <input type="text" id="treatment-input" placeholder="treatment">
-    <input type="text" id="prescription-input" placeholder="prescription">
-    <input type="text" id="follow-up-date-input" placeholder="date"> 
- 
- 
-
+    <input type="text" id="vis-patient-id-input" placeholder="Patient Id">
+    <input type="text" id="vis-date-input" placeholder="YYYY-MM-DD HH:MM">
+    <input type="text" id="vis-symptoms-input" placeholder="symptoms">
+    <input type="text" id="vis-diagnosis-input" placeholder="diagnosis"> 
+    <input type="text" id="vis-treatment-input" placeholder="treatment">
+    <input type="text" id="vis-prescription-input" placeholder="prescription">
+    <input type="text" id="vis-follow-up-date-input" placeholder="YYYY-MM-DD HH:MM"> 
     <button onclick="registerVisit()">Register</button>
 
     <script>
+        console.log("VERSION 2 LOADED");
         fetch("http://127.0.0.1:8000/patients")
             .then(response => response.json())
             .then(data => {
@@ -162,15 +160,21 @@
         }
 
         function registerAppointment() {
-            const name = document.getElementById("patients-name-input").value;
-            const doctorsname = document.getElementById("doctors-name-input").value;
-            const appointmentdate = document.getElementById("appointment-date-input").value;
-            const reason = document.getElementById("reason-input").value;
+            console.log("appointment button clicked");
+            const patientId = document.getElementById("appt-patient-id-input").value;
+            const doctorId = document.getElementById("appt-doctor-id-input").value;
+            const date = document.getElementById("appt-date-input").value;
+            const reason = document.getElementById("appt-reason-input").value;
 
             fetch("http://127.0.0.1:8000/appointments", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ name: name, doctorsname: doctors-name, appointmentdate: appointment-date, reason: reason })
+                body: JSON.stringify({
+                    patient_id: parseInt(patientId),
+                    doctor_id: parseInt(doctorId),
+                    appointment_date: date,
+                    reason: reason
+                })
             })
             .then(response => response.json())
             .then(data => {
@@ -191,18 +195,19 @@
         }
 
         function registerVisit() {
-            const name = document.getElementById("patients-name-input").value;
-            const visitdate = document.getElementById("visit-date-input").value;
-            const sypmtoms = document.getElementById("syptoms-input").value;
-            const diagnosis = document.getElementById("diagnosis-input").value;
-            const treatment = document.getElementById("treatment-input").value;
-            const prescription = document.getElementById("prescription-input").value;
-            const followupdate = document.getElementById("follow-up-date-input").value;
+            console.log("visit button clicked");
+            const patientId = document.getElementById("vis-patient-id-input").value;
+            const visitdate = document.getElementById("vis-date-input").value;
+            const symptoms = document.getElementById("vis-symptoms-input").value;
+            const diagnosis = document.getElementById("vis-diagnosis-input").value;
+            const treatment = document.getElementById("vis-treatment-input").value;
+            const prescription = document.getElementById("vis-prescription-input").value;
+            const followupdate = document.getElementById("vis-follow-up-date-input").value;
 
             fetch("http://127.0.0.1:8000/visits", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ name: name, visitdate: visit-date, sypmtoms: sypmtoms, diagnosis: diagnosis, treatment: treatment, prescription: prescription, followupdate: follow-up-date })
+                body: JSON.stringify({ patient_id: parseInt(patientId), visit_date: visitdate, symptoms: symptoms, diagnosis: diagnosis, treatment: treatment, prescription: prescription, follow_up_date: followupdate })
             })
             .then(response => response.json())
             .then(data => {
@@ -211,7 +216,7 @@
             });
         }
 
-        function deleteVist(visitId) {
+        function deleteVisit(visitId) {
             fetch(`http://127.0.0.1:8000/visits/${visitId}`, {
                 method: "DELETE"
             })
