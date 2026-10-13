@@ -40,7 +40,7 @@
 
         button {
             padding: 6px 12px;
-            background: #2a6f97;
+            background: #352a97;
             color: white;
             border: none;
             border-radius: 4px;
@@ -49,6 +49,13 @@
 
         button:hover {
             background: #1d5372;
+        }
+        .delete-btn {
+            background: #c0392b;
+        }
+
+        .delete-btn:hover {
+            background: #922b21;
         }
     </style>
 </head>
@@ -97,6 +104,7 @@
 
             const deleteButton = document.createElement("button");
             deleteButton.textContent = "Delete";
+            deleteButton.className = "delete-btn";
             deleteButton.onclick = () => deletePatient(patient.id);
 
             item.appendChild(deleteButton);
@@ -114,6 +122,7 @@
 
             const deleteButton = document.createElement("button");
             deleteButton.textContent = "Delete";
+            deleteButton.className = "delete-btn";
             deleteButton.onclick = () => deleteDoctor(doctor.id);
 
             item.appendChild(deleteButton);
@@ -129,6 +138,7 @@
             const item = document.createElement("li");
             item.textContent = `${appointment.patient_name} with Dr. ${appointment.doctor_name} on ${appointment.appointment_date} — ${appointment.reason} `;                const deleteButton = document.createElement("button");
             deleteButton.textContent = "Delete";
+            deleteButton.className = "delete-btn";
             deleteButton.onclick = () => deleteAppointment(appointment.id);
 
             item.appendChild(deleteButton);
@@ -146,6 +156,7 @@
 
             const deleteButton = document.createElement("button");
             deleteButton.textContent = "Delete";
+            deleteButton.className = "delete-btn";
             deleteButton.onclick = () => deleteVisit(visit.id);
 
             item.appendChild(deleteButton);
